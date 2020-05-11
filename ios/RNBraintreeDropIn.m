@@ -41,6 +41,7 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
     }
 
     BTDropInRequest *request = [[BTDropInRequest alloc] init];
+    request.cardDisabled = true;
 
     NSDictionary* threeDSecureOptions = options[@"threeDSecure"];
     if (threeDSecureOptions) {
