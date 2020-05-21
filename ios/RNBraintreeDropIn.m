@@ -42,6 +42,8 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
 
     BTDropInRequest *request = [[BTDropInRequest alloc] init];
     request.cardDisabled = true;
+    request.paypalDisabled = ![options[@"paypal"] boolValue];
+    request.applePayDisabled = ![options[@"applePay"] boolValue];
 
     NSDictionary* threeDSecureOptions = options[@"threeDSecure"];
     if (threeDSecureOptions) {
