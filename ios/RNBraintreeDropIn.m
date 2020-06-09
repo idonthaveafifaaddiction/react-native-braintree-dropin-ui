@@ -1,6 +1,7 @@
 #import "RNBraintreeDropIn.h"
 #import <React/RCTUtils.h>
 #import "BTThreeDSecureRequest.h"
+#import "BTPayPalAccountNonce.h"
 
 @implementation RNBraintreeDropIn
 
@@ -110,16 +111,7 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
             } else if (result.cancelled) {
                 reject(@"USER_CANCELLATION", @"The user cancelled", nil);
             } else {
-                if (threeDSecureOptions && [result.paymentMethod isKindOfClass:[BTCardNonce class]]) {
-                    BTCardNonce *cardNonce = (BTCardNonce *)result.paymentMethod;
-                    if (!cardNonce.threeDSecureInfo.liabilityShiftPossible && cardNonce.threeDSecureInfo.wasVerified) {
-                        reject(@"3DSECURE_NOT_ABLE_TO_SHIFT_LIABILITY", @"3D Secure liability cannot be shifted", nil);
-                    } else if (!cardNonce.threeDSecureInfo.liabilityShifted && cardNonce.threeDSecureInfo.wasVerified) {
-                        reject(@"3DSECURE_LIABILITY_NOT_SHIFTED", @"3D Secure liability was not shifted", nil);
-                    } else{
-                        [[self class] resolvePayment:result deviceData:self.deviceDataCollector resolver:resolve];
-                    }
-                } else if(result.paymentMethod == nil && (result.paymentOptionType == 16 || result.paymentOptionType == 18)){ //Apple Pay
+                if(result.paymentMethod == nil && (result.paymentOptionType == 16 || result.paymentOptionType == 18)){ //Apple Pay
                     // UIViewController *ctrl = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
                     // [ctrl presentViewController:self.viewController animated:YES completion:nil];
                     UIViewController *rootViewController = RCTPresentedViewController();
@@ -179,13 +171,14 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
 }
 
 + (void)resolvePayment:(BTDropInResult* _Nullable)result deviceData:(NSString * _Nonnull)deviceDataCollector resolver:(RCTPromiseResolveBlock _Nonnull)resolve {
-    //NSLog(@"result = %@", result);
 
     NSMutableDictionary* jsResult = [NSMutableDictionary new];
-
-    //NSLog(@"paymentMethod = %@", result.paymentMethod);
-    //NSLog(@"paymentIcon = %@", result.paymentIcon);
-
+    if(result.paymentOptionType == BTUIKPaymentOptionTypePayPal) {
+        BTPayPalAccountNonce *paypalNonce = (BTPayPalAccountNonce *)result.paymentMethod;
+        [jsResult setObject:paypalNonce.firstName forKey:@"firstName"];
+        [jsResult setObject:paypalNonce.lastName forKey:@"lastName"];
+        [jsResult setObject:paypalNonce.email forKey:@"email"];
+    }
     [jsResult setObject:result.paymentMethod.nonce forKey:@"nonce"];
     [jsResult setObject:result.paymentMethod.type forKey:@"type"];
     [jsResult setObject:result.paymentDescription forKey:@"description"];
