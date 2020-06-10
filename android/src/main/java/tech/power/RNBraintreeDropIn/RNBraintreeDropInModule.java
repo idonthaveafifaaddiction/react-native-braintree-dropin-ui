@@ -14,6 +14,7 @@ import com.facebook.react.bridge.Promise;
 import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.models.PayPalAccountNonce;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.braintreepayments.api.models.CardNonce;
 import com.braintreepayments.api.models.ThreeDSecureInfo;
@@ -133,6 +134,12 @@ public class RNBraintreeDropInModule extends ReactContextBaseJavaModule {
 
   private final void resolvePayment(PaymentMethodNonce paymentMethodNonce, String deviceData) {
     WritableMap jsResult = Arguments.createMap();
+    if(paymentMethodNonce instanceof PayPalAccountNonce) {
+      PayPalAccountNonce payPalAccountNonce = (PayPalAccountNonce) paymentMethodNonce;
+      jsResult.putString("firstName", payPalAccountNonce.getFirstName());
+      jsResult.putString("lastName", payPalAccountNonce.getLastName());
+      jsResult.putString("email", payPalAccountNonce.getEmail());
+    }
     jsResult.putString("nonce", paymentMethodNonce.getNonce());
     jsResult.putString("type", paymentMethodNonce.getTypeLabel());
     jsResult.putString("description", paymentMethodNonce.getDescription());
