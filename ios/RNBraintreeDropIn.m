@@ -93,7 +93,11 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
             @[
                 [PKPaymentSummaryItem summaryItemWithLabel:merchantName amount:orderTotal]
             ];
-
+        if (@available(iOS 11.0, *)) {
+            self.paymentRequest.requiredBillingContactFields = [[NSSet<PKContactField> alloc] initWithObjects: PKContactFieldPostalAddress, nil];
+        } else {
+            reject(@"MISSING_OPTIONS", @"Not all required Apple Pay options were provided", nil);
+        }
         self.viewController = [[PKPaymentAuthorizationViewController alloc] initWithPaymentRequest: self.paymentRequest];
         self.viewController.delegate = self;
     }else{
@@ -150,7 +154,16 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
             [result setObject:[NSString stringWithFormat: @"%@ %@", @"", tokenizedApplePayPayment.type] forKey:@"description"];
             [result setObject:[NSNumber numberWithBool:false] forKey:@"isDefault"];
             [result setObject:self.deviceDataCollector forKey:@"deviceData"];
-
+            if(payment.billingContact && payment.billingContact.postalAddress) {
+                NSString *street = payment.billingContact.postalAddress.street;
+                NSArray *splitArray = [street componentsSeparatedByString:@"\n"];
+                [result setObject:splitArray[0] forKey:@"addressLine1"];
+                [result setObject:splitArray[1] forKey:@"addressLine2"];
+                [result setObject:payment.billingContact.postalAddress.city forKey:@"city"];
+                [result setObject:payment.billingContact.postalAddress.state forKey:@"state"];
+                [result setObject:payment.billingContact.postalAddress.ISOCountryCode forKey:@"country"];
+                [result setObject:payment.billingContact.postalAddress.postalCode forKey:@"zip1"];
+            }
             self.resolve(result);
 
         } else {
