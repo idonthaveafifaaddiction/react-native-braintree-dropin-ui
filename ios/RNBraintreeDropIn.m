@@ -182,6 +182,12 @@ RCT_EXPORT_METHOD(show:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)r
     [jsResult setObject:result.paymentMethod.nonce forKey:@"nonce"];
     [jsResult setObject:result.paymentMethod.type forKey:@"type"];
     [jsResult setObject:result.paymentDescription forKey:@"description"];
+    [jsResult setObject:paypalNonce.billingAddress.streetAddress forKey:@"addressLine1"];
+    [jsResult setObject:paypalNonce.billingAddress.extendedAddress forKey:@"addressLine2"];
+    [jsResult setObject:paypalNonce.billingAddress.locality forKey:@"city"];
+    [jsResult setObject:paypalNonce.billingAddress.region forKey:@"state"];
+    [jsResult setObject:paypalNonce.billingAddress.countryCodeAlpha2 forKey:@"country"];
+    [jsResult setObject:paypalNonce.billingAddress.postalCode forKey:@"zip1"];
     [jsResult setObject:[NSNumber numberWithBool:result.paymentMethod.isDefault] forKey:@"isDefault"];
     [jsResult setObject:deviceDataCollector forKey:@"deviceData"];
 
