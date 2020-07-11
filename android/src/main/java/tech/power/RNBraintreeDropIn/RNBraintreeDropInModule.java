@@ -19,6 +19,8 @@ import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.braintreepayments.api.models.CardNonce;
 import com.braintreepayments.api.models.ThreeDSecureInfo;
 import com.braintreepayments.api.models.GooglePaymentRequest;
+import com.braintreepayments.api.models.GooglePaymentCardNonce;
+import com.braintreepayments.api.models.PostalAddress;
 import com.google.android.gms.wallet.TransactionInfo;
 import com.google.android.gms.wallet.WalletConstants;
 
