@@ -66,6 +66,7 @@ public class RNBraintreeDropInModule extends ReactContextBaseJavaModule {
           .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
           .setCurrencyCode(options.getString("currencyCode"))
           .build())
+          .emailRequired(true)
           .billingAddressRequired(true)
           .billingAddressFormat(1)
           .googleMerchantId(options.getString("googlePayMerchantId"));
